@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Efek Jawaban Benar & Salah</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      text-align: center;
+      padding-top: 100px;
+      transition: background-color 0.2s;
+      overflow: hidden;
+    }
+
+    h1 { margin-bottom: 30px; }
+
+    button {
+      padding: 14px 28px;
+      font-size: 18px;
+      margin: 0 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: transform 0.1s;
+      color: white;
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    .correct {
+      background: #2ecc71;
+    }
+
+    .wrong {
+      background: #e63946;
+    }
+
+    /* Flash merah */
+    @keyframes flash-red {
+      0%, 100% { background-color: transparent; }
+      50% { background-color: rgba(255, 0, 0, 0.5); }
+    }
+    .flash-fail {
+      animation: flash-red 0.3s ease-in-out;
+    }
+
+    /* Flash hijau */
+    @keyframes flash-green {
+      0%, 100% { background-color: transparent; }
+      50% { background-color: rgba(0, 255, 100, 0.4); }
+    }
+    .flash-success {
+      animation: flash-green 0.4s ease-in-out;
+    }
+
+    /* Goyangan */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-15px); }
+      40%, 80% { transform: translateX(15px); }
+    }
+    .shake {
+      animation: shake 0.4s ease-in-out;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pilih Jawaban Kamu</h1>
+  <button class="correct" onclick="successEffect()">Jawaban Benar ✅</button>
+  <button class="wrong" onclick="failEffect()">Jawaban Salah ❌</button>
+
+  <!-- Suara -->
+  <audio id="success-sound" src="./sound/right.mp3"></audio>
+  <audio id="fail-sound" src="./sound/wrong.mp3"></audio>
+
+  <!-- canvas-confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <script>
+    // Efek Jawaban Benar
+    function successEffect() {
+      const sound = document.getElementById("success-sound");
+      sound.currentTime = 0;
+      sound.play();
+
+      // Flash hijau
+      document.body.classList.add("flash-success");
+      setTimeout(() => document.body.classList.remove("flash-success"), 400);
+
+      // Konfeti warna-warni
+      confetti({
+        particleCount: 150,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#00ff99', '#00ffff', '#ffff00', '#ff99ff']
+      });
+    }
+
+    // Efek Jawaban Salah
+    function failEffect() {
+      const sound = document.getElementById("fail-sound");
+      sound.currentTime = 0;
+      sound.play();
+
+      // Flash merah
+      document.body.classList.add("flash-fail");
+      setTimeout(() => document.body.classList.remove("flash-fail"), 300);
+
+      // Goyangan layar
+      document.body.classList.add("shake");
+      setTimeout(() => document.body.classList.remove("shake"), 400);
+
+      // Partikel merah
+      const duration = 800;
+      const end = Date.now() + duration;
+      (function frame() {
+        confetti({
+          particleCount: 8,
+          startVelocity: 35,
+          spread: 180,
+          origin: { x: Math.random(), y: Math.random() },
+          colors: ['#ff0000', '#ff4d4d'],
+          gravity: 2,
+          scalar: 0.8
+        });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      }());
+    }
+  </script>
+</body>
+</html>

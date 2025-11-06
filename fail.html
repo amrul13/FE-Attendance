@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Efek Jawaban Salah Seru</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding-top: 100px;
+      transition: background-color 0.2s;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 18px;
+      cursor: pointer;
+      border: none;
+      background: #e63946;
+      color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: transform 0.1s;
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    /* Flash merah cepat */
+    @keyframes flash-red {
+      0%, 100% { background-color: transparent; }
+      50% { background-color: rgba(255, 0, 0, 0.5); }
+    }
+    .flash-fail {
+      animation: flash-red 0.3s ease-in-out;
+    }
+
+    /* Goyangan layar */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-15px); }
+      40%, 80% { transform: translateX(15px); }
+    }
+    .shake {
+      animation: shake 0.4s ease-in-out;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pilih Jawaban</h1>
+  <button onclick="failEffect()">Jawaban Salah ❌</button>
+
+  <audio id="fail-sound" src="./sound/wrong.mp3"></audio>
+
+  <!-- canvas-confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <script>
+    function failEffect() {
+      const sound = document.getElementById("fail-sound");
+      sound.currentTime = 0;
+      sound.play();
+
+      // Flash merah
+      document.body.classList.add("flash-fail");
+      setTimeout(() => document.body.classList.remove("flash-fail"), 300);
+
+      // Goyangan
+      document.body.classList.add("shake");
+      setTimeout(() => document.body.classList.remove("shake"), 400);
+
+      // Partikel merah (meledak ke luar)
+      const duration = 800;
+      const end = Date.now() + duration;
+      (function frame() {
+        confetti({
+          particleCount: 8,
+          startVelocity: 35,
+          spread: 180,
+          origin: { x: Math.random(), y: Math.random() },
+          colors: ['#ff0000', '#ff4d4d'],
+          gravity: 2,
+          scalar: 0.8
+        });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      }());
+    }
+  </script>
+</body>
+</html>
