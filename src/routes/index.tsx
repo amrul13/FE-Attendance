@@ -25,7 +25,7 @@ export default function AppRoutes() {
       <Routes>
         {/* Halaman login */}
         <Route path="/welcome" element={<WelcomePage />} />
-        <Route path="/siswa" element={<DashboardSiswa />} />
+        <Route path="/siswa/:sessionId" element={<DashboardSiswa />} />
         <Route path="/guru" element={<DashboardGuru />} />
         <Route path="/student" element={<StudentManagement />} />
         <Route

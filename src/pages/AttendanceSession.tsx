@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
@@ -302,15 +302,45 @@ const SpeakingPanel: React.FC<SpeakingPanelProps> = ({
  */
 export default function AttendanceSession() {
   const [students] = useState<Student[]>(mockStudents);
-  const [currentlySpeaking, setCurrentlySpeaking] = useState<Student>(
-    mockStudents[0]
-  );
+  const [currentlySpeaking, setCurrentlySpeaking] = useState<string>("");
   const [detectedWord] = useState<string>("Serendipity");
+
   const { sessionCode } = useParams<{ sessionCode: string }>();
+  
+  const wsRef = useRef<WebSocket | null>(null);
+
+  const connectWebSocket = () => {
+    const ws = new WebSocket("wss://localhost:8000/ws/teacher");
+    wsRef.current = ws;
+
+    ws.onopen = () => console.log("✅ Connected to WebSocket");
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      // setCurrentlySpeaking(data.name);
+      console.log("📩 Received:", data);
+      console.log("📩 Received:", data.result.name);
+      // setCurrentlySpeaking(data.name);
+    };
+    ws.onclose = () => {
+      console.warn("❌ WebSocket disconnected. Reconnecting...");
+      setTimeout(connectWebSocket, 3000); // auto reconnect after 3s
+    };
+    ws.onerror = (err) => {
+      console.error("⚠️ WebSocket error:", err);
+      ws.close();
+    };
+  };
+
+  useEffect(() => {
+    connectWebSocket();
+    return () => {
+      wsRef.current?.close();
+    };
+  }, []);
 
 
   const handleSelectStudent = (student: Student) => {
-    setCurrentlySpeaking(student);
+    // setCurrentlySpeaking(student);
   };
 
   const navigate = useNavigate();
@@ -373,7 +403,7 @@ export default function AttendanceSession() {
             <StudentList
               students={students}
               onSelectStudent={handleSelectStudent}
-              activeStudentId={currentlySpeaking.id}
+              activeStudentId={currentlySpeaking}
             />
           </div>
 

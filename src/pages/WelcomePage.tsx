@@ -123,7 +123,7 @@ const StudentJoinView = () => {
 
       const data = await response.json();
       toast.success(`Joined session successfully! Session ID: ${data.id}`);
-      navigate("/siswa")
+      navigate(`/siswa/${data.id}?theme=${data.theme_id}`);
     } catch (error: any) {
       toast.error(error.message || "Something went wrong");
     } finally {
